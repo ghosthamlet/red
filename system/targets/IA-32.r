@@ -251,25 +251,25 @@ make-profilable make target-class [
 		emit #{01C4}								;-- ADD esp, eax
 	]
 	
-	emit-reserve-stack: func [slots [integer!] /local bytes][
-		bytes: slots * stack-width
-		either bytes > 127 [
+	emit-reserve-stack: func [slots [integer!] /local b][
+		b: slots * stack-width
+		either b > 127 [
 			emit #{81EC}							;-- SUB esp, bytes	; 32-bit displacement
-			emit to-bin32 bytes
+			emit to-bin32 b
 		][
 			emit #{83EC}							;-- SUB esp, bytes	; 8-bit displacement
-			emit to-bin8 bytes
+			emit to-bin8 b
 		]
 	]
 	
-	emit-release-stack: func [slots [integer!] /local bytes][
-		bytes: slots * stack-width
-		either bytes > 127 [
+	emit-release-stack: func [slots [integer!] /bytes /local b][
+		b: either bytes [slots][slots * stack-width]
+		either b > 127 [
 			emit #{81C4}							;-- ADD esp, bytes	; 32-bit displacement
-			emit to-bin32 bytes
+			emit to-bin32 b
 		][
 			emit #{83C4}							;-- ADD esp, bytes	; 8-bit displacement
-			emit to-bin8 bytes
+			emit to-bin8 b
 		]		
 	]
 	
@@ -1913,7 +1913,7 @@ make-profilable make target-class [
 				size: size + pick [12 8] args/1 = #typed 	;-- account for extra arguments
 			]
 		]
-		emit-release-stack size
+		emit-release-stack/bytes size
 	]
 	
 	patch-call: func [code-buf rel-ptr dst-ptr][

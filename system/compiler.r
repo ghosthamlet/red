@@ -2877,9 +2877,9 @@ system-dialect: make-profilable context [
 			]
 		]
 		
-		get-caller: has [list found? /root][
+		get-caller: func [/root /local list found?][
 			list: back back tail expr-call-stack
-			unless root [return find calling-keywords list/1]
+			unless root [return any [all [find calling-keywords list/1 none] list/1]]
 			
 			while [found?: find calling-keywords list/1][list: back list]
 			all [not found? not tail? next list list/1]
